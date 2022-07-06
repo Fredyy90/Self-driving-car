@@ -11,13 +11,16 @@ class Car{
         this.friction=0.05;
         this.angle=0;
         this.damaged=false;
+        this.killed=false;
+
+        this.overtakes = 0;
 
         this.useBrain=controlType=="AI";
 
         if(controlType!="DUMMY"){
             this.sensor=new Sensor(this);
             this.brain=new NeuralNetwork(
-                [this.sensor.rayCount,6,4]
+                [this.sensor.rayCount,8,4]
             );
         }
         this.controls=new Controls(controlType);
@@ -38,10 +41,23 @@ class Car{
             maskCtx.globalCompositeOperation="destination-atop";
             maskCtx.drawImage(this.img,0,0,this.width,this.height);
         }
+        
+        this.polygon=this.#createPolygon();
     }
 
-    update(roadBorders,traffic){
-        if(!this.damaged){
+    isActive(){
+        return !this.damaged && !this.killed;
+    }
+
+    checkToKill(bestCar){
+        if(this.y > bestCar.y + 200){
+            this.killed = true;
+        }
+
+    }
+
+    update(roadBorders,traffic, bestCar = false){
+        if(this.isActive()){
             this.#move();
             this.polygon=this.#createPolygon();
             this.damaged=this.#assessDamage(roadBorders,traffic);
@@ -146,7 +162,7 @@ class Car{
         ctx.save();
         ctx.translate(this.x,this.y);
         ctx.rotate(-this.angle);
-        if(!this.damaged){
+        if(this.isActive()){
             ctx.drawImage(this.mask,
                 -this.width/2,
                 -this.height/2,

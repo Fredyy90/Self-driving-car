@@ -8,7 +8,7 @@ const networkCtx = networkCanvas.getContext("2d");
 
 const road=new Road(carCanvas.width/2,carCanvas.width*0.9);
 
-const N=100;
+const N=1000;
 const cars=generateCars(N);
 let bestCar=cars[0];
 if(localStorage.getItem("bestBrain")){
@@ -21,7 +21,7 @@ if(localStorage.getItem("bestBrain")){
     }
 }
 
-const traffic = new Traffic(road, 20);
+const traffic = new Traffic(road, 10);
 
 animate();
 
@@ -44,15 +44,20 @@ function generateCars(N){
 
 function animate(time){
 
-    traffic.update(road.borders,[]);
+    traffic.update(road.borders, bestCar, cars);
 
     for(let i=0;i<cars.length;i++){
+        //console.log(traffic.cars);
         cars[i].update(road.borders,traffic.cars);
     }
     bestCar=cars.find(
         c=>c.y==Math.min(
             ...cars.map(c=>c.y)
         ));
+
+    for(let i=0;i<cars.length;i++){
+        cars[i].checkToKill(bestCar);
+    }
 
     carCanvas.height=window.innerHeight;
     networkCanvas.height=window.innerHeight;
@@ -74,5 +79,14 @@ function animate(time){
 
     networkCtx.lineDashOffset=-time/50;
     Visualizer.drawNetwork(networkCtx,bestCar.brain);
+
+    const killedCars = cars.filter(car=>car.killed==true && car.damaged==false).length;
+    const damagedCars = cars.filter(car=>car.damaged==true).length;
+
+    document.getElementById("totalCars").textContent = cars.length;
+    document.getElementById("aliveCars").textContent = cars.length - killedCars - damagedCars;
+    document.getElementById("damagedCars").textContent = damagedCars;
+    document.getElementById("killedCars").textContent = killedCars;
+
     requestAnimationFrame(animate);
 }

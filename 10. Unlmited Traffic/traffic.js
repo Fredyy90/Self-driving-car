@@ -9,30 +9,77 @@ class Traffic{
 
         this.carLimit = carLimit;
         this.carYOffset = carYOffset;
-        this.#createCars();
+        this.#fillCars();
 
     }
 
-    #createCars(){
+    getFirstCar(){
 
-        while(this.cars.length < this.carLimit){
-            
-            let position = this.carYOffset; 
-            let lane = road.getLaneCenter(road.getMiddleLane());
+        return this.cars.find(
+                    c=>c.y==Math.min(
+                        ...this.cars.map(c=>c.y)
+                    ));  
+
+    }
+
+    #createCar(firstFill = false, position = this.carYOffset, matchSpeed = false){
+
+        let lane = road.getLaneCenter(road.getRandomLane());
+
+        if(firstFill){
             if(this.carCounter != 0){
-                lane = road.getLaneCenter(road.getRandomLane());
-                position *= this.carCounter; //+(Math.random()*2-1); 
+                position *= this.carCounter; //+Math.round(Math.random()*2-1); 
+            }else{                
+                lane = road.getLaneCenter(road.getMiddleLane());
             }
-            this.cars.push(new Car(lane,position,30,50,"DUMMY",2,getRandomColor()));
-            this.carCounter++;
+        }
+
+        const newCar = new Car(lane,position,30,50,"DUMMY",2,getRandomColor());
+        if(matchSpeed){
+            newCar.speed = this.getFirstCar().speed
+        }
+
+        this.cars.push(newCar);5
+        this.carCounter++;
+
+    }
+
+    #fillCars(){
+
+        while(this.cars.length < this.carLimit){            
+            this.#createCar(true);
         }
 
     }
 
-    update(roadBorders,traffic){
+    update(roadBorders, bestCar, aiCars = []){
+
         this.cars.forEach(car => {
-            car.update(roadBorders,traffic);            
+            car.update(roadBorders,[]);            
         });
+
+        if(aiCars){
+
+            const aliveCars = aiCars.filter(car => car.isActive());
+
+            if(aliveCars.length > 0){
+
+                const worstAliveCar=aliveCars.find(
+                    c=>c.y==Math.max(
+                        ...aliveCars.map(c=>c.y)
+                    ));                       
+
+                for(let i = 0; i < this.cars.length; i++){
+                    if(this.cars[i].y-this.cars[i].height > worstAliveCar.y){
+                        this.cars.splice(i, 1);
+                        this.#createCar(false, this.getFirstCar().y + this.carYOffset, true);
+                        console.log("removed traffic car");
+                    }
+                }
+            }
+
+        }
+
     }
 
     draw(ctx,drawSensor=false){
