@@ -27,6 +27,15 @@ class Road{
             Math.min(laneIndex,this.laneCount-1)*laneWidth;
     }
 
+    getMiddleLane(){
+        return Math.floor(this.laneCount/2);
+    }
+
+    getRandomLane(){
+        const randomLane = Math.floor(Math.random() * (this.laneCount + 1));
+        return randomLane;
+    }
+
     draw(ctx){
         ctx.lineWidth=5;
         ctx.strokeStyle="white";

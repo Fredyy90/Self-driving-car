@@ -21,15 +21,7 @@ if(localStorage.getItem("bestBrain")){
     }
 }
 
-const traffic=[
-    new Car(road.getLaneCenter(1),-100,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(0),-300,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(2),-300,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(0),-500,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(1),-500,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(1),-700,30,50,"DUMMY",2,getRandomColor()),
-    new Car(road.getLaneCenter(2),-700,30,50,"DUMMY",2,getRandomColor()),
-];
+const traffic = new Traffic(road, 20);
 
 animate();
 
@@ -51,11 +43,11 @@ function generateCars(N){
 }
 
 function animate(time){
-    for(let i=0;i<traffic.length;i++){
-        traffic[i].update(road.borders,[]);
-    }
+
+    traffic.update(road.borders,[]);
+
     for(let i=0;i<cars.length;i++){
-        cars[i].update(road.borders,traffic);
+        cars[i].update(road.borders,traffic.cars);
     }
     bestCar=cars.find(
         c=>c.y==Math.min(
@@ -69,9 +61,8 @@ function animate(time){
     carCtx.translate(0,-bestCar.y+carCanvas.height*0.7);
 
     road.draw(carCtx);
-    for(let i=0;i<traffic.length;i++){
-        traffic[i].draw(carCtx);
-    }
+    traffic.draw(carCtx);
+
     carCtx.globalAlpha=0.2;
     for(let i=0;i<cars.length;i++){
         cars[i].draw(carCtx);
