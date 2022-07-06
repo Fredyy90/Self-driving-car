@@ -14,6 +14,7 @@ class Car{
         this.killed=false;
 
         this.overtakes = 0;
+        this.lastOvertake = Date.now();
 
         this.useBrain=controlType=="AI";
 
@@ -51,6 +52,9 @@ class Car{
 
     checkToKill(bestCar){
         if(this.y > bestCar.y + 200){
+            this.killed = true;
+        }
+        if(Date.now() - this.lastOvertake > 10*1000){
             this.killed = true;
         }
 

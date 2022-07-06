@@ -72,7 +72,11 @@ class Traffic{
                 for(let i = 0; i < this.cars.length; i++){
                     if(this.cars[i].y-this.cars[i].height > worstAliveCar.y){
                         this.cars.splice(i, 1);
-                        this.#createCar(false, this.getFirstCar().y + this.carYOffset, true);
+                        this.#createCar(false, this.getFirstCar().y + (this.carYOffset * (Math.random()*0.5+0.5)), true);
+                        aliveCars.map(car=>{
+                            car.overtakes++;
+                            car.lastOvertake = Date.now();
+                        });
                         console.log("removed traffic car");
                     }
                 }
