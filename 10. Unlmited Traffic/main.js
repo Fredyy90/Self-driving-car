@@ -2,7 +2,7 @@ let cars, traffic, bestCar, road, prevBestBrain;
 
 let generation = 0;
 const N=250;
-const mutationRate = 0.1;
+const mutationRate = 0.05;
 
 const carCanvas=document.getElementById("carCanvas");
 carCanvas.width=350;
@@ -111,6 +111,6 @@ function animate(time){
     if(aliveCars > 0){
         requestAnimationFrame(animate);
     }else{
-        restart();
+        setTimeout(restart,3000);
     }
 }
