@@ -2,10 +2,10 @@ let cars, traffic, bestCar, road, prevBestBrain;
 
 let generation = 0;
 const N=250;
-const mutationRate = 0.05;
+let mutationRate = 0.2;
 
 const carCanvas=document.getElementById("carCanvas");
-carCanvas.width=350;
+carCanvas.width=300;
 const networkCanvas=document.getElementById("networkCanvas");
 networkCanvas.width=300;
 
@@ -17,6 +17,10 @@ start();
 function start(brain = false){
 
     generation++;
+
+    if(generation % 50 == 0){
+        mutationRate /= 2;
+    }
 
     if(brain == false){
         brain = localStorage.getItem("bestBrain");
@@ -100,17 +104,17 @@ function animate(time){
 
     const killedCars = cars.filter(car=>car.killed==true && car.damaged==false).length;
     const damagedCars = cars.filter(car=>car.damaged==true).length;
-    const aliveCars = cars.length - killedCars - damagedCars
+    const aliveCars = cars.filter(car=>car.isActive());
 
     document.getElementById("generation").textContent = generation;
     document.getElementById("totalCars").textContent = cars.length;
-    document.getElementById("aliveCars").textContent = aliveCars;
+    document.getElementById("aliveCars").textContent = aliveCars.length;
     document.getElementById("damagedCars").textContent = damagedCars;
     document.getElementById("killedCars").textContent = killedCars;
 
-    if(aliveCars > 0){
-        requestAnimationFrame(animate);
+    if(aliveCars.length <= 0 || (aliveCars.length == 1 && bestCar == aliveCars[0])){
+        setTimeout(restart,1500);
     }else{
-        setTimeout(restart,3000);
+        requestAnimationFrame(animate);
     }
 }
