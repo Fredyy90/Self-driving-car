@@ -25,17 +25,23 @@ class Traffic{
 
     #createCar(firstFill = false, position = this.carYOffset, matchSpeed = false){
 
-        let lane = road.getLaneCenter(road.getRandomLane());
+        let lane = road.getRandomLane();
 
         if(firstFill){
-            if(this.carCounter != 0){
-                position *= this.carCounter; //+Math.round(Math.random()*2-1); 
-            }else{                
-                lane = road.getLaneCenter(road.getMiddleLane());
+            
+            if(this.carCounter <= road.getMiddleLane()){
+                lane = this.carCounter;
+            }else if(this.carCounter <= (road.getMiddleLane()*2)+1){
+                
+                lane = road.laneCount - (this.carCounter-road.getMiddleLane());
+                position *= 3;
+            }else{
+                position *= this.carCounter+Math.round(Math.random()*2-1); 
             }
+
         }
 
-        const newCar = new Car(lane,position,30,50,"DUMMY",2,getRandomColor());
+        const newCar = new Car(road.getLaneCenter(lane),position,30,50,"DUMMY",2,getRandomColor());
         if(matchSpeed){
             newCar.speed = this.getFirstCar().speed
         }
