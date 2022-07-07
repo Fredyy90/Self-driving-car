@@ -1,8 +1,8 @@
 let cars, traffic, bestCar, road, prevBestBrain;
 
 let generation = 0;
-const N=500;
-const mutationRate = 0.05;
+const N=250;
+const mutationRate = 0.1;
 
 const carCanvas=document.getElementById("carCanvas");
 carCanvas.width=350;
@@ -41,6 +41,10 @@ function start(brain = false){
     
     traffic = new Traffic(road, 15);
     animate();
+}
+
+function restart(){
+    start(JSON.stringify(bestCar.brain));
 }
 
 function save(){
@@ -107,6 +111,6 @@ function animate(time){
     if(aliveCars > 0){
         requestAnimationFrame(animate);
     }else{
-        start(JSON.stringify(bestCar.brain));
+        restart();
     }
 }
