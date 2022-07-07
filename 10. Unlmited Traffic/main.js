@@ -1,29 +1,47 @@
+let cars, traffic, bestCar, road, prevBestBrain;
+
+let generation = 0;
+const N=500;
+const mutationRate = 0.05;
+
 const carCanvas=document.getElementById("carCanvas");
-carCanvas.width=200;
+carCanvas.width=350;
 const networkCanvas=document.getElementById("networkCanvas");
 networkCanvas.width=300;
 
 const carCtx = carCanvas.getContext("2d");
 const networkCtx = networkCanvas.getContext("2d");
 
-const road=new Road(carCanvas.width/2,carCanvas.width*0.9);
+start();
 
-const N=1000;
-const cars=generateCars(N);
-let bestCar=cars[0];
-if(localStorage.getItem("bestBrain")){
-    for(let i=0;i<cars.length;i++){
-        cars[i].brain=JSON.parse(
-            localStorage.getItem("bestBrain"));
-        if(i!=0){
-            NeuralNetwork.mutate(cars[i].brain,0.1);
+function start(brain = false){
+
+    generation++;
+
+    if(brain == false){
+        brain = localStorage.getItem("bestBrain");
+    }
+
+    road=new Road(carCanvas.width/2,carCanvas.width*0.9);
+
+    cars=generateCars(N);
+    bestCar=cars[0];
+    if(brain){
+        for(let i=0;i<cars.length;i++){
+            cars[i].brain=JSON.parse(brain);
+            if(i!=0){
+                NeuralNetwork.mutate(cars[i].brain, mutationRate);
+            }
         }
     }
+    if(prevBestBrain){
+        cars[1].brain=JSON.parse(prevBestBrain);
+    }
+    prevBestBrain = brain;
+    
+    traffic = new Traffic(road, 15);
+    animate();
 }
-
-const traffic = new Traffic(road, 10);
-
-animate();
 
 function save(){
     localStorage.setItem("bestBrain",
@@ -37,7 +55,7 @@ function discard(){
 function generateCars(N){
     const cars=[];
     for(let i=1;i<=N;i++){
-        cars.push(new Car(road.getLaneCenter(1),100,30,50,"AI"));
+        cars.push(new Car(road.getLaneCenter(road.getMiddleLane()),100,30,50,"AI"));
     }
     return cars;
 }
@@ -47,13 +65,9 @@ function animate(time){
     traffic.update(road.borders, bestCar, cars);
 
     for(let i=0;i<cars.length;i++){
-        //console.log(traffic.cars);
         cars[i].update(road.borders,traffic.cars);
     }
-    bestCar=cars.find(
-        c=>c.y==Math.min(
-            ...cars.map(c=>c.y)
-        ));
+    bestCar=Car.findBestCar(cars);
 
     for(let i=0;i<cars.length;i++){
         cars[i].checkToKill(bestCar);
@@ -82,11 +96,17 @@ function animate(time){
 
     const killedCars = cars.filter(car=>car.killed==true && car.damaged==false).length;
     const damagedCars = cars.filter(car=>car.damaged==true).length;
+    const aliveCars = cars.length - killedCars - damagedCars
 
+    document.getElementById("generation").textContent = generation;
     document.getElementById("totalCars").textContent = cars.length;
-    document.getElementById("aliveCars").textContent = cars.length - killedCars - damagedCars;
+    document.getElementById("aliveCars").textContent = aliveCars;
     document.getElementById("damagedCars").textContent = damagedCars;
     document.getElementById("killedCars").textContent = killedCars;
 
-    requestAnimationFrame(animate);
+    if(aliveCars > 0){
+        requestAnimationFrame(animate);
+    }else{
+        start(JSON.stringify(bestCar.brain));
+    }
 }

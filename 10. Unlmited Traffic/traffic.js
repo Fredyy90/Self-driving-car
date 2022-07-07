@@ -1,6 +1,7 @@
 class Traffic{
 
     cars = [];
+    removedCars = [];
     carLimit = 0;
     carCounter = 0;
     carYOffset = -100;
@@ -68,18 +69,21 @@ class Traffic{
                     c=>c.y==Math.max(
                         ...aliveCars.map(c=>c.y)
                     ));                       
-
+                    
                 for(let i = 0; i < this.cars.length; i++){
-                    if(this.cars[i].y-this.cars[i].height > worstAliveCar.y){
-                        this.cars.splice(i, 1);
+                    if(this.cars[i].y-this.cars[i].height > worstAliveCar.y+worstAliveCar.sensor.rayLength){
+                        this.removedCars.push(...this.cars.splice(i, 1));
                         this.#createCar(false, this.getFirstCar().y + (this.carYOffset * (Math.random()*0.5+0.5)), true);
-                        aliveCars.map(car=>{
-                            car.overtakes++;
-                            car.lastOvertake = Date.now();
-                        });
-                        console.log("removed traffic car");
                     }
                 }
+                aliveCars.map(aliveCar=>{
+                    aliveCar.updateOvertakes(
+                        [
+                            ...this.removedCars,
+                            ...this.cars
+                        ]
+                    );
+                });
             }
 
         }
