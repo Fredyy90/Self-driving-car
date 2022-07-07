@@ -76,8 +76,9 @@ class Car{
 
     updateOvertakes(otherCars){
         let oldOvertakes = this.overtakes;
-        this.overtakes = otherCars.filter(otherCar=>otherCar.y>this.y).length;
-        if(this.overtakes > oldOvertakes){
+        let newOvertakes = otherCars.filter(otherCar=>otherCar.y>this.y).length;
+        if(newOvertakes > oldOvertakes){
+            this.overtakes = newOvertakes;
             this.lastOvertake = Date.now();
         }
     }
