@@ -77,7 +77,7 @@ function animate(time){
     networkCanvas.height=window.innerHeight;
 
     carCtx.save();
-    carCtx.translate(0,-bestCar.y+carCanvas.height*0.7);
+    carCtx.translate(0,-bestCar.y+carCanvas.height*0.6);
 
     road.draw(carCtx);
     traffic.draw(carCtx);
