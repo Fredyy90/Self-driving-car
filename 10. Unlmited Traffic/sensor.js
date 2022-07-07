@@ -40,7 +40,9 @@ class Sensor{
 
 
         for(let i=0;i<traffic.length;i++){
-            if((this.car.y - traffic[i].y) < this.rayLength){
+            if((this.car.y - traffic[i].y) < this.rayLength 
+                && (traffic[i].y - this.car.y) < this.rayLength 
+            ){
                 const poly=traffic[i].polygon;
                 for(let j=0;j<poly.length;j++){
                     const value=getIntersection(
