@@ -51,13 +51,35 @@ class Car{
     }
 
     checkToKill(bestCar){
-        if(this.y > bestCar.y + 200){
+        if(this.y > bestCar.y + 300){
             this.killed = true;
         }
-        if(Date.now() - this.lastOvertake > 10*1000){
+        if(Date.now() - this.lastOvertake > 15*1000){
             this.killed = true;
         }
 
+    }
+
+    static findBestCar(cars){
+
+        const mostOvertakes = cars.filter(
+            c=>c.overtakes==Math.max(
+                ...cars.map(c=>c.overtakes)
+            ));
+
+        return mostOvertakes.find(
+                c=>c.y==Math.min(
+                    ...mostOvertakes.map(c=>c.y)
+                ));
+
+    }
+
+    updateOvertakes(otherCars){
+        let oldOvertakes = this.overtakes;
+        this.overtakes = otherCars.filter(otherCar=>otherCar.y>this.y).length;
+        if(this.overtakes > oldOvertakes){
+            this.lastOvertake = Date.now();
+        }
     }
 
     update(roadBorders,traffic, bestCar = false){
