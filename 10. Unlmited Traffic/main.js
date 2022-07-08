@@ -1,8 +1,8 @@
 let cars, traffic, bestCar, road, prevBestBrain;
 
 let generation = 0;
-const N=250;
-let mutationRate = 0.2;
+const N=500;
+let mutationRate = 0.05;
 
 const carCanvas=document.getElementById("carCanvas");
 carCanvas.width=300;
@@ -18,7 +18,7 @@ function start(brain = false){
 
     generation++;
 
-    if(generation % 50 == 0){
+    if(generation % 100 == 0){
         mutationRate /= 2;
     }
 
@@ -43,7 +43,7 @@ function start(brain = false){
     }
     prevBestBrain = brain;
     
-    traffic = new Traffic(road, 15);
+    traffic = new Traffic(road, generation, 15);
     animate();
 }
 

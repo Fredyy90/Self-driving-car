@@ -6,8 +6,10 @@ class Traffic{
     carCounter = 0;
     carYOffset = -100;
 
-    constructor(road, carLimit = 10, carYOffset = -100){
+    constructor(road, generation = 0, carLimit = 10, carYOffset = -100){
 
+        this.road = road;
+        this.generation = generation;
         this.carLimit = carLimit;
         this.carYOffset = carYOffset;
         this.#fillCars();
@@ -25,23 +27,35 @@ class Traffic{
 
     #createCar(firstFill = false, position = this.carYOffset, matchSpeed = false){
 
-        let lane = road.getRandomLane();
+        let lane = this.road.getRandomLane();
 
         if(firstFill){
-            
-            if(this.carCounter <= road.getMiddleLane()){
-                lane = this.carCounter;
-            }else if(this.carCounter <= (road.getMiddleLane()*2)+1){
-                
-                lane = road.laneCount - (this.carCounter-road.getMiddleLane());
-                position *= 3;
-            }else{
-                position *= this.carCounter+Math.round(Math.random()*2-1); 
-            }
+
+
+                if(this.carCounter <= this.road.getMiddleLane()){
+                    
+                    if(this.generation % 2 == 0){
+                        lane = this.carCounter;
+                    }else{
+                        lane = this.road.laneCount - this.carCounter - 1;
+                    }
+
+                }else if(this.carCounter <= (this.road.getMiddleLane()*2)+1){
+                    
+                    if(this.generation % 2 == 0){
+                        lane = this.road.laneCount - (this.carCounter-this.road.getMiddleLane());
+                    }else{
+                        lane = this.carCounter - this.road.getMiddleLane()-1;
+                    }
+                    
+                    position *= 3;
+                }else{
+                    position *= (this.carCounter-1);//+Math.round(Math.random()*2-1); 
+                }
 
         }
 
-        const newCar = new Car(road.getLaneCenter(lane),position,30,50,"DUMMY",2,getRandomColor());
+        const newCar = new Car(this.road.getLaneCenter(lane),position,30,50,"DUMMY",2,getRandomColor());
         if(matchSpeed){
             newCar.speed = this.getFirstCar().speed
         }
